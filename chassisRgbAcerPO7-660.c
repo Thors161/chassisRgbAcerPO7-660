@@ -83,6 +83,12 @@ static void color_packet(unsigned char packet[7],
     packet[6] = 0x03;
 }
 
+static int fixed_color_effect(const unsigned char effect[6])
+{
+    return !memcmp(effect, (unsigned char[]){1, 0, 3, 3, 0, 255}, 6) ||
+           !memcmp(effect, (unsigned char[]){1, 0, 5, 5, 0, 255}, 6);
+}
+
 int main(int argc, char **argv)
 {
     unsigned char rgb[3], brightness = 0, effect[6], before[6], after[6], packet[7];
@@ -141,7 +147,7 @@ int main(int argc, char **argv)
         close(fd);
         return 1;
     }
-    if (memcmp(effect, (unsigned char[]){1, 0, 3, 3, 0, 255}, 6) ||
+    if (!fixed_color_effect(effect) ||
         before[4] != 0xff || before[5] != 0xff || before[3] > 100) {
         fprintf(stderr, "unexpected controller state; no changes made\n"
                 "  effect:  %02x %02x %02x %02x %02x %02x\n"
